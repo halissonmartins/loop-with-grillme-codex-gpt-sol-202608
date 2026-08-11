@@ -8,23 +8,23 @@ espaçamento e cor, e a inconsistência só aparece na vigésima tela.
 
 **Bloqueado por:** 04.
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Critérios de aceitação**
 
-- [ ] De três a cinco fluxos principais escritos passo a passo, **com os estados de erro**. No
+- [x] De três a cinco fluxos principais escritos passo a passo, **com os estados de erro**. No
       mínimo: encontrar e baixar um relatório; um RELATOR pendente de vínculo entrando pela primeira
       vez; um GERENTE concedendo acesso a um conjunto de relatórios.
-- [ ] O fluxo de download cobre explicitamente os desfechos que não são o feliz: artefato expurgado
+- [x] O fluxo de download cobre explicitamente os desfechos que não são o feliz: artefato expurgado
       por retenção (RN-39), execução vigente fora de sucesso ou alerta (RN-42) e recusa por limite
       de simultaneidade (RN-53). São três mensagens diferentes, e nenhuma delas é "erro genérico".
-- [ ] O fluxo de listagem trata a armadilha do domínio: a interface precisa **desfazer ativamente**
+- [x] O fluxo de listagem trata a armadilha do domínio: a interface precisa **desfazer ativamente**
       a leitura errada da data de referência — o artefato de uma data carrega o movimento fechado do
       dia anterior (RN-07).
-- [ ] Design system com tokens de cor, tipografia, espaçamento, raio e sombra, e a regra de que
+- [x] Design system com tokens de cor, tipografia, espaçamento, raio e sombra, e a regra de que
       nenhum valor fora deles é admitido.
-- [ ] Padrões de estado definidos uma única vez: carregando, vazio, erro, sucesso, desabilitado.
-- [ ] Requisitos de acessibilidade declarados: contraste mínimo AA, foco visível em todo elemento
+- [x] Padrões de estado definidos uma única vez: carregando, vazio, erro, sucesso, desabilitado.
+- [x] Requisitos de acessibilidade declarados: contraste mínimo AA, foco visível em todo elemento
       interativo, rótulo associado a todo campo.
-- [ ] Registro do porquê de cada fluxo ser esse e do que foi descartado.
-- [ ] Idioma da interface e das mensagens em pt-BR (RNF-15).
+- [x] Registro do porquê de cada fluxo ser esse e do que foi descartado.
+- [x] Idioma da interface e das mensagens em pt-BR (RNF-15).
