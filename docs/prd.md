@@ -635,5 +635,7 @@ As nove questões da revisão anterior foram respondidas.
 | [`adr/`](./adr/) | Uma decisão estruturante por arquivo | Existe |
 | [`guias/guia-app-web.md`](./guias/guia-app-web.md) | Método: define os artefatos exigidos em cada fase | Existe |
 | [`especificacao.md`](./especificacao.md) | Spec do MVP: histórias, decisões de implementação e costuras de teste | Existe |
+| [`arquitetura/c4-contexto.md`](./arquitetura/c4-contexto.md) | Diagramas C4 de contexto e contêineres | Existe |
+| [`riscos.md`](./riscos.md) | Riscos técnicos abertos, aceitos e seus encaminhamentos | Existe |
 | `user-stories.md` | Histórias com critério de aceite em Given/When/Then | Coberto por [`especificacao.md`](./especificacao.md) §3, com os `RF-NN` deste PRD como critério; o Given/When/Then vive nos `.feature` (E3) |
 | `design/fluxos.md` | Os fluxos principais com estados de erro | **Não existe** — P1 |
