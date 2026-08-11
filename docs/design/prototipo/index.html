@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Protótipo descartável — Relatórios agendados</title>
+    <style>
+      :root { color: #14213d; font-family: Arial, sans-serif; background: #f5f7fb; }
+      body { margin: 0; }
+      header, main { max-width: 1040px; margin: auto; padding: 24px; }
+      header { display: flex; justify-content: space-between; align-items: center; }
+      h1 { margin: 0; font-size: 1.7rem; } h2 { margin-top: 0; } h3 { margin-bottom: 8px; }
+      .tag { color: #704700; background: #fff0c8; padding: 6px 10px; border-radius: 999px; font-size: .8rem; }
+      .tabs { display: flex; gap: 8px; margin-bottom: 20px; } button { cursor: pointer; }
+      .tabs button, .action { border: 0; border-radius: 6px; padding: 10px 14px; background: #203a69; color: white; }
+      .tabs button[aria-selected="false"] { background: #dfe7f5; color: #14213d; }
+      .screen { display: none; } .screen.active { display: block; }
+      .card { background: white; border: 1px solid #d9e0eb; border-radius: 10px; padding: 20px; margin-bottom: 18px; box-shadow: 0 2px 8px #14213d0d; }
+      .steps, .grid { display: grid; gap: 14px; } .steps { grid-template-columns: repeat(3, 1fr); }
+      .grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+      label { display: grid; gap: 6px; font-weight: bold; } select, input { padding: 9px; border: 1px solid #aab6c7; border-radius: 6px; font: inherit; }
+      .help { color: #526276; margin: 8px 0 0; } .notice { border-left: 4px solid #a46600; background: #fff7df; padding: 14px; }
+      .result { display: none; } .result.visible { display: block; }
+      .error { border-left: 4px solid #c83e3e; background: #fff0f0; padding: 14px; margin-top: 12px; }
+      .success { border-left: 4px solid #27824b; background: #edfff2; padding: 14px; margin-top: 12px; }
+      table { width: 100%; border-collapse: collapse; } th, td { padding: 10px; text-align: left; border-bottom: 1px solid #d9e0eb; }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; } .chip { background: #e5ecf7; border-radius: 99px; padding: 4px 8px; font-size: .85rem; }
+      .error-options { display: flex; gap: 8px; flex-wrap: wrap; } .error-options button { padding: 8px; background: white; border: 1px solid #b8c5d8; border-radius: 6px; }
+      footer { color: #526276; font-size: .85rem; padding: 24px; text-align: center; }
+      @media (max-width: 650px) { .steps { grid-template-columns: 1fr; } header { align-items: flex-start; flex-direction: column; gap: 10px; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div><h1>Relatórios agendados</h1><p class="help">Protótipo navegável — dados fictícios</p></div>
+      <span class="tag">Descartável: ISSUE 04</span>
+    </header>
+    <main>
+      <nav class="tabs" aria-label="Fluxos do protótipo">
+        <button type="button" aria-selected="true" data-screen="reports">Encontrar relatório</button>
+        <button type="button" aria-selected="false" data-screen="access">Conceder acesso</button>
+      </nav>
+
+      <section id="reports" class="screen active">
+        <div class="card notice"><strong>Data de referência não é o movimento do mesmo dia.</strong><br />O ciclo de <strong>11/08/2026</strong> traz o movimento fechado em <strong>10/08/2026</strong>.</div>
+        <div class="card"><h2>Encontrar um relatório</h2><p class="help">As datas disponíveis aparecem em cada relatório; não há campo para informar Data de referência.</p>
+          <div class="steps"><label>1. Produto<select id="product"><option value="">Selecione</option><option>Poupança</option><option>Cliente</option></select></label>
+            <label>2. Relatório<select id="report" disabled><option value="">Escolha o Produto primeiro</option></select></label>
+            <label>Simular desfecho<select id="download-outcome"><option value="success">Download disponível</option><option value="expired">Artefato expurgado</option><option value="status">Execução indisponível</option><option value="limit">Limite de simultaneidade</option></select></label></div>
+          <div id="report-result" class="result success"><strong id="report-title"></strong><p>Referência: <span id="reference-date"></span> · movimento fechado: <span id="closed-date"></span>.</p><button class="action" type="button" id="download">Baixar PDF</button><div id="download-error"></div></div>
+        </div>
+      </section>
+
+      <section id="access" class="screen">
+        <div class="card"><h2>Conceder acesso por Cadeia de permissão</h2><p class="help">A cadeia é N:N: Relatórios → papéis (roles) → grupos → usuários. Um usuário recebe a <strong>união</strong> dos relatórios de todos os seus grupos.</p></div>
+        <div class="grid">
+          <div class="card"><h3>Relatórios e papéis (roles)</h3><label>Relatório<select id="access-report"><option>POUP-0001 — Saldos</option><option>CLI-0001 — Clientes</option></select></label><label>Papel<select id="access-role"><option>ROLE_POUPANCA</option><option>ROLE_CLIENTE</option></select></label><button class="action" type="button" data-link="report">Vincular papel</button><p id="report-links" class="chips"></p></div>
+          <div class="card"><h3>Papéis (roles) e grupos</h3><label>Papel<select id="group-role"><option>ROLE_POUPANCA</option><option>ROLE_CLIENTE</option></select></label><label>Grupo<select id="role-group"><option>Agência Centro</option><option>Gerência Regional</option></select></label><button class="action" type="button" data-link="role">Vincular grupo</button><p id="role-links" class="chips"></p></div>
+          <div class="card"><h3>Usuários e grupos</h3><label>Usuário<select id="user"><option value="ana">Ana Martins</option><option value="bruno">Bruno Lima</option></select></label><label>Grupo<select id="user-group"><option>Agência Centro</option><option>Gerência Regional</option></select></label><button class="action" type="button" data-link="user">Vincular grupo</button><div id="access-result"></div></div>
+        </div>
+      </section>
+    </main>
+    <footer>Não é produto: sem backend, autorização, validação ou testes. O ticket 05 registra o aceite humano e aposenta este código.</footer>
+    <script>
+      const catalogue = { Poupança: [['POUP-0001', 'Saldos consolidados', '11/08/2026', '10/08/2026'], ['POUP-0002', 'Movimentações', '10/08/2026', '09/08/2026']], Cliente: [['CLI-0001', 'Clientes ativos', '11/08/2026', '10/08/2026']] };
+      const product = document.querySelector('#product'), report = document.querySelector('#report'), result = document.querySelector('#report-result');
+      document.querySelectorAll('[data-screen]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-screen]').forEach(item => item.setAttribute('aria-selected', 'false')); document.querySelectorAll('.screen').forEach(item => item.classList.remove('active')); button.setAttribute('aria-selected', 'true'); document.querySelector('#' + button.dataset.screen).classList.add('active'); }));
+      product.addEventListener('change', () => { report.innerHTML = '<option value="">Selecione</option>'; (catalogue[product.value] || []).forEach(([code, name]) => report.add(new Option(code + ' — ' + name, code))); report.disabled = !product.value; result.classList.remove('visible'); });
+      report.addEventListener('change', () => { const item = (catalogue[product.value] || []).find(([code]) => code === report.value); if (!item) return; document.querySelector('#report-title').textContent = item[0] + ' — ' + item[1]; document.querySelector('#reference-date').textContent = item[2]; document.querySelector('#closed-date').textContent = item[3]; result.classList.add('visible'); });
+      const messages = { expired: '<div class="error"><strong>Indisponível por retenção.</strong><br />O artefato desta data foi expurgado conforme a política de retenção.</div>', status: '<div class="error"><strong>Exportação indisponível.</strong><br />A execução vigente ainda não está em processado com sucesso ou alerta.</div>', limit: '<div class="error"><strong>Exportação recusada temporariamente.</strong><br />O limite de exportações simultâneas foi atingido. Aguarde e tente novamente.</div>' };
+      document.querySelector('#download').addEventListener('click', () => { const outcome = document.querySelector('#download-outcome').value; document.querySelector('#download-error').innerHTML = outcome === 'success' ? '<div class="success">Download do PDF iniciado.</div>' : messages[outcome]; });
+      const access = { ana: ['Agência Centro', 'Gerência Regional'], bruno: ['Gerência Regional'] }, reportLinks = ['POUP-0001 → ROLE_POUPANCA', 'CLI-0001 → ROLE_CLIENTE'], roleLinks = ['ROLE_POUPANCA → Agência Centro', 'ROLE_CLIENTE → Agência Centro', 'ROLE_CLIENTE → Gerência Regional'];
+      function chips(target, values) { document.querySelector(target).innerHTML = values.map(value => '<span class="chip">' + value + '</span>').join(''); }
+      function showAccess() { const groups = access[document.querySelector('#user').value]; const reports = groups.includes('Agência Centro') ? ['POUP-0001 — Saldos consolidados', 'CLI-0001 — Clientes ativos'] : ['CLI-0001 — Clientes ativos']; document.querySelector('#access-result').innerHTML = '<div class="success"><p><strong>Grupos:</strong></p><p class="chips">' + groups.map(group => '<span class="chip">' + group + '</span>').join('') + '</p><p><strong>União dos relatórios alcançados:</strong></p><p class="chips">' + reports.map(item => '<span class="chip">' + item + '</span>').join('') + '</p></div>'; }
+      document.querySelector('[data-link="report"]').addEventListener('click', () => { reportLinks.push(document.querySelector('#access-report').value.split(' — ')[0] + ' → ' + document.querySelector('#access-role').value); chips('#report-links', reportLinks); });
+      document.querySelector('[data-link="role"]').addEventListener('click', () => { roleLinks.push(document.querySelector('#group-role').value + ' → ' + document.querySelector('#role-group').value); chips('#role-links', roleLinks); });
+      document.querySelector('[data-link="user"]').addEventListener('click', () => { const groups = access[document.querySelector('#user').value], group = document.querySelector('#user-group').value; if (!groups.includes(group)) groups.push(group); showAccess(); });
+      document.querySelector('#user').addEventListener('change', showAccess); chips('#report-links', reportLinks); chips('#role-links', roleLinks); showAccess();
+    </script>
+  </body>
+</html>

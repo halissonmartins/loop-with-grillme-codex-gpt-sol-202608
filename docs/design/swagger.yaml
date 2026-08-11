@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: Relatórios agendados — fachada descartável
+  version: 0.0.0-prototype
+  description: Contrato manual da ISSUE 04. Será substituído pelo SpringDoc no ticket 08; não possui implementação.
+paths:
+  /relatorios/disponiveis:
+    get:
+      summary: Lista relatórios navegáveis por data, Produto e relatório
+      responses:
+        '200': { description: Lista navegável, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/RelatorioDisponivel' } } } } }
+  /relatorios/{codigo}/exportacoes/{formato}:
+    get:
+      summary: Exporta o artefato vigente no formato solicitado
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+        - name: formato
+          in: path
+          required: true
+          schema: { type: string, enum: [pdf, xlsx, docx, csv] }
+      responses:
+        '200': { description: Arquivo exportado }
+        '409': { description: Execução vigente não está em sucesso ou alerta, content: { application/json: { schema: { $ref: '#/components/schemas/Erro' } } } }
+        '410': { description: Artefato expurgado pela retenção, content: { application/json: { schema: { $ref: '#/components/schemas/Erro' } } } }
+        '429': { description: Limite de exportações simultâneas atingido; repetir mais tarde, content: { application/json: { schema: { $ref: '#/components/schemas/Erro' } } } }
+  /relatorios/{codigo}/roles:
+    put:
+      summary: Vincula roles ao relatório
+      parameters: [ { $ref: '#/components/parameters/codigo' } ]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/VinculoRoles' } } } }
+      responses: { '204': { description: Vínculos atualizados } }
+  /roles/{role}/grupos:
+    put:
+      summary: Vincula grupos à role de relatório
+      parameters: [ { name: role, in: path, required: true, schema: { type: string } } ]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/VinculoGrupos' } } } }
+      responses: { '204': { description: Vínculos atualizados } }
+  /usuarios/{usuarioId}/grupos:
+    put:
+      summary: Vincula grupos ao usuário
+      parameters: [ { name: usuarioId, in: path, required: true, schema: { type: string } } ]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/VinculoGrupos' } } } }
+      responses: { '204': { description: Vínculos atualizados } }
+components:
+  parameters:
+    codigo: { name: codigo, in: path, required: true, schema: { type: string } }
+  schemas:
+    RelatorioDisponivel: { type: object, required: [codigo, nome, produto, dataReferencia], properties: { codigo: { type: string }, nome: { type: string }, produto: { type: string }, dataReferencia: { type: string, example: '11/08/2026' }, movimentoFechadoEm: { type: string, example: '10/08/2026' } } }
+    VinculoRoles: { type: object, required: [roles], properties: { roles: { type: array, items: { type: string } } } }
+    VinculoGrupos: { type: object, required: [grupos], properties: { grupos: { type: array, items: { type: string } } } }
+    Erro: { type: object, required: [momento, descricao, correlationId], properties: { momento: { type: string, format: date-time }, descricao: { type: string }, correlationId: { type: string } } }
