@@ -9,6 +9,18 @@
 Um termo do domínio é definido **apenas** no glossário. O PRD e a arquitetura usam os termos e
 não os redefinem.
 
+# Workflow de implementação (importante):
+- Uma ISSUE por vez, mesmo que ela esteja "bloqueada por nada"
+- Planeje a ISSUE
+- Se tiver codifição, implemente cada item do plano usando Desenvolvimento Orientado a Testes (TDD)
+- Certifique que todos os cenários referenciados foram implementados 
+- Se tiver codifição, certifique que o projeto ou módulo executa sua construção com sucesso
+- Inicie um agente para fazer a revisão. Verificar o item foi implementado conforme descrito na documentação e também classificar cada item encontrado por criticidade
+- Caso o agente encontre algo na revisão: analisar, corrigir, validar e construir
+- Marque o critério de aceitação que foi entregue como concluído
+- Fazer commits pequenos e atômicos, onde cada commit deve focar em apenas uma tarefa lógica
+- Após concluir complementamente todos os itens da ISSUE, fazer o push
+
 # Diretrizes
 
 Diretrizes comportamentais para reduzir erros comuns. Combine com instruções específicas do projeto, conforme necessário.
