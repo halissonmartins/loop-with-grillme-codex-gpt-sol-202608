@@ -57,3 +57,15 @@ replay_pid*
 
 # Claude Code - configuracao pessoal (nao versionar)
 .claude/settings.local.json
+/.env
+/.idea/
+/.vscode/
+/.mvn/timing.properties
+**/.DS_Store
+**/node_modules/
+**/dist/
+**/out-tsc/
+**/target/
+**/.angular/
+*.iml
+*.log
