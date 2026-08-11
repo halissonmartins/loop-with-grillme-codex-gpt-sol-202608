@@ -21,6 +21,30 @@ Para iniciar a API em `http://localhost:8080` e o frontend em `http://localhost:
 make dev
 ```
 
+## Ambiente local de dependências
+
+Após criar o `.env` pelo `make setup`, suba PostgreSQL, Keycloak, MinIO, Airflow, Traefik, Mailpit,
+OpenTelemetry Collector, Graylog, Prometheus, Grafana e Jaeger com:
+
+```bash
+make infra-up
+```
+
+Os consoles locais ficam nas portas definidas em `.env.example`: Keycloak (`8081`), MinIO (`9001`),
+Airflow (`8082`), Traefik (`8083`), Mailpit (`8025`), Graylog (`9002`), Prometheus (`9090`), Grafana
+(`3000`) e Jaeger (`16686`). Todos os contêineres usam `America/Sao_Paulo` e imagens de versão
+fixada. Para executar o teste Testcontainers que sobe esse mesmo Compose, rode:
+
+```bash
+make infra-test
+```
+
+Remova contêineres, redes e volumes para retornar ao estado limpo:
+
+```bash
+make infra-down
+```
+
 ## Qualidade e build
 
 ```bash

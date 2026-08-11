@@ -1,0 +1,239 @@
+name: relatorios
+
+x-timezone: &timezone
+  TZ: ${TZ}
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 10s
+  timeout: 5s
+  retries: 12
+  start_period: 20s
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    environment:
+      <<: *timezone
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+  keycloak:
+    image: ${KEYCLOAK_IMAGE}
+    command: start-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *timezone
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      KC_DB: postgres
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_HEALTH_ENABLED: 'true'
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        [
+          'CMD-SHELL',
+          "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000",
+        ]
+    ports:
+      - '${KEYCLOAK_PORT}:8080'
+
+  minio:
+    image: ${MINIO_IMAGE}
+    command: server /data --console-address :9001
+    environment:
+      <<: *timezone
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'curl --fail --silent http://localhost:9000/minio/health/live']
+    ports:
+      - '${MINIO_API_PORT}:9000'
+      - '${MINIO_CONSOLE_PORT}:9001'
+    volumes:
+      - minio-data:/data
+
+  airflow:
+    image: ${AIRFLOW_IMAGE}
+    command: standalone
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *timezone
+      AIRFLOW__API__BASE_URL: http://localhost:${AIRFLOW_PORT}
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD}
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_ADMIN_USERNAME}
+    healthcheck:
+      <<: *healthcheck-defaults
+      start_period: 90s
+      test: ['CMD-SHELL', 'curl --fail --silent http://localhost:8080/health']
+    ports:
+      - '${AIRFLOW_PORT}:8080'
+    volumes:
+      - airflow-logs:/opt/airflow/logs
+
+  traefik:
+    image: ${TRAEFIK_IMAGE}
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --entrypoints.web.address=:80
+      - --ping=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+    environment:
+      <<: *timezone
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD', 'traefik', 'healthcheck', '--ping']
+    ports:
+      - '${TRAEFIK_PORT}:8080'
+      - '${TRAEFIK_WEB_PORT}:80'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  mailpit:
+    image: ${MAILPIT_IMAGE}
+    environment:
+      <<: *timezone
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'wget --quiet --spider http://localhost:8025/livez']
+    ports:
+      - '${MAILPIT_SMTP_PORT}:1025'
+      - '${MAILPIT_WEB_PORT}:8025'
+
+  otel-collector:
+    image: ${OTEL_COLLECTOR_IMAGE}
+    command: ['--config=/etc/otelcol-contrib/config.yaml']
+    environment:
+      <<: *timezone
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD', '/otelcol-contrib', '--version']
+    ports:
+      - '${OTEL_GRPC_PORT}:4317'
+      - '${OTEL_HTTP_PORT}:4318'
+    volumes:
+      - ./config/otel/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+
+  mongodb:
+    image: ${MONGODB_IMAGE}
+    environment:
+      <<: *timezone
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.runCommand({ ping: 1 }).ok']
+    volumes:
+      - mongodb-data:/data/db
+
+  opensearch:
+    image: ${OPENSEARCH_IMAGE}
+    environment:
+      <<: *timezone
+      DISABLE_INSTALL_DEMO_CONFIG: 'true'
+      DISABLE_SECURITY_PLUGIN: 'true'
+      discovery.type: single-node
+    healthcheck:
+      <<: *healthcheck-defaults
+      start_period: 60s
+      test: ['CMD-SHELL', 'curl --fail --silent http://localhost:9200/_cluster/health']
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+  graylog:
+    image: ${GRAYLOG_IMAGE}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    environment:
+      <<: *timezone
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://opensearch:9200
+      GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
+      GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
+      GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET}
+      GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2}
+      GRAYLOG_ROOT_TIMEZONE: ${TZ}
+    healthcheck:
+      <<: *healthcheck-defaults
+      start_period: 90s
+      test: ['CMD-SHELL', 'curl --fail --silent http://localhost:9000/api/system/lbstatus']
+    ports:
+      - '${GRAYLOG_PORT}:9000'
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-lifecycle
+    environment:
+      <<: *timezone
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'wget --quiet --spider http://localhost:9090/-/ready']
+    ports:
+      - '${PROMETHEUS_PORT}:9090'
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+
+  grafana:
+    image: ${GRAFANA_IMAGE}
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    environment:
+      <<: *timezone
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USERNAME}
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'wget --quiet --spider http://localhost:3000/api/health']
+    ports:
+      - '${GRAFANA_PORT}:3000'
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  jaeger:
+    image: ${JAEGER_IMAGE}
+    environment:
+      <<: *timezone
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ['CMD-SHELL', 'wget --quiet --spider http://localhost:16686/']
+    ports:
+      - '${JAEGER_PORT}:16686'
+
+volumes:
+  airflow-logs:
+  grafana-data:
+  minio-data:
+  mongodb-data:
+  opensearch-data:
+  postgres-data:
+  prometheus-data:
