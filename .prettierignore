@@ -1,0 +1,10 @@
+.agents/
+.mvn/
+**/dist/
+**/node_modules/
+**/out-tsc/
+**/target/
+**/.angular/
+AGENTS.md
+docs/
+skills-lock.json
