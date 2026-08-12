@@ -14,27 +14,27 @@ invenção entra como fato consumado em toda a cadeia a jusante, a começar pelo
 
 **Bloqueado por:** nada — pode começar imediatamente.
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Critérios de aceitação**
 
-- [ ] **RNF-01, RA-08** — os **dez** relatórios definidos: dois por produto, para os cinco produtos
+- [x] **RNF-01, RA-08** — os **dez** relatórios definidos: dois por produto, para os cinco produtos
       de RA-04.
-- [ ] **RN-02, RN-03, RN-04** — cada um com código `SIGLA-NNNN`, os quatro dígitos únicos dentro do
+- [x] **RN-02, RN-03, RN-04** — cada um com código `SIGLA-NNNN`, os quatro dígitos únicos dentro do
       produto, nome, descrição e **tempo estimado inicial** em segundos inteiros maior que zero.
-- [ ] **RN-48, RNF-19** — a soma dos tempos estimados de cada produto cabe no teto, verificável no
+- [x] **RN-48, RNF-19** — a soma dos tempos estimados de cada produto cabe no teto, verificável no
       papel antes de existir código. Um catálogo seed que já nasce estourando o teto faz o módulo não
       subir no ticket 07, e o achado apareceria como bug de implementação em vez de erro de
       definição.
-- [ ] **Modelo de dados do schema transacional de cada produto** — as tabelas de onde a consulta
+- [x] **Modelo de dados do schema transacional de cada produto** — as tabelas de onde a consulta
       principal lê. Cinco schemas independentes, cada um lido **exclusivamente** pelo seu próprio
       módulo (RA-10).
-- [ ] **RA-17, RN-34** — a **consulta principal** de cada relatório, declarada: é ela que vira o
+- [x] **RA-17, RN-34** — a **consulta principal** de cada relatório, declarada: é ela que vira o
       dataset bruto do `.csv.gz` e a base do JRXML.
-- [ ] Volume semeável **abaixo do teto de RNF-06** no caminho feliz, e um caminho semeável **acima**
+- [x] Volume semeável **abaixo do teto de RNF-06** no caminho feliz, e um caminho semeável **acima**
       dele para o cenário de recusa do ticket 12 (RF-49). Sem um dataset grande de propósito, aquele
       critério não tem como ser exercido.
-- [ ] **RA-08, distribuição das características de risco**, com o mapa escrito de qual relatório
+- [x] **RA-08, distribuição das características de risco**, com o mapa escrito de qual relatório
       cobre qual. Duas exigências, com alcances diferentes:
       - **por par** — os dois relatórios de um mesmo módulo têm imagens e fontes diferentes entre
         si. É o que exercita o risco de as fontes **não** irem embutidas no artefato renderizado;
@@ -44,13 +44,13 @@ invenção entra como fato consumado em toda a cadeia a jusante, a começar pelo
       Só estes dois dos quatro riscos da arquitetura §12 são propriedade do **conteúdo** de um
       relatório. `serialVersionUID` e a confiança em desserializar origem conhecida decorrem do mono
       repositório (RA-01) e não se pedem a um relatório de exemplo.
-- [ ] Um par com **um relatório notoriamente mais lento que o outro**: o ticket 12 precisa de "um
+- [x] Um par com **um relatório notoriamente mais lento que o outro**: o ticket 12 precisa de "um
       lento e um são" para provar que abortar um não derruba o vizinho (RF-05).
-- [ ] **Nenhum JRXML é escrito neste ticket.** A convenção de autoria é do ticket 18, e escrever
+- [x] **Nenhum JRXML é escrito neste ticket.** A convenção de autoria é do ticket 18, e escrever
       modelo antes dela é exatamente o apodrecimento que o ADR-0006 prevê.
-- [ ] A definição vive em documento versionado em `docs/`, e a pendência sai de
+- [x] A definição vive em documento versionado em `docs/`, e a pendência sai de
       `arquitetura-inicial.md` §14 e de `especificacao.md` §6 — pendência resolvida que continua
       listada como aberta é ruído que custa uma leitura inteira.
-- [ ] Os códigos do PRD §8.1 permanecem **ilustração do regex** e não são promovidos a catálogo. São
+- [x] Os códigos do PRD §8.1 permanecem **ilustração do regex** e não são promovidos a catálogo. São
       cinco, um por produto, com dígitos deliberadamente espalhados; quem chega com pressa os toma
       por definição.

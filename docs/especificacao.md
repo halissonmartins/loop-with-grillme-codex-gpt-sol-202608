@@ -637,7 +637,6 @@ homologação; virtualização do `JasperPrint` na exportação.
 
 - Modelagem detalhada das tabelas do schema de controle — é E2 do guia, e esta spec fixa apenas os
   conjuntos e os invariantes de cada um.
-- Definição dos relatórios de exemplo *(RA-08)* e dos seus modelos de dados.
 - Definição dos nomes dos módulos e da arquitetura interna de cada um.
 - O eixo de Produto/Design a jusante: `design/fluxos.md` (P1) e `design/design-system.md` (P2)
   continuam inexistentes e são **pré-requisito de E3** pelo próprio guia. Nenhuma tela deve ser

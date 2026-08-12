@@ -496,7 +496,6 @@ reavaliados.**
 
 - Definição dos nomes dos módulos.
 - Definição da arquitetura interna de cada módulo e sua respectiva estrutura.
-- Definição dos relatórios de exemplo (RA-08) e seus respectivos modelos de dados.
 - Modelagem detalhada das tabelas do schema de controle (E2 do guia).
 
 **Resolvidos nesta revisão**
