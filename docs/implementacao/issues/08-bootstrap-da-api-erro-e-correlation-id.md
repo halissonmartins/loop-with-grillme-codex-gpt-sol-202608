@@ -12,24 +12,24 @@ no `ARCHITECTURE.md` como implementação de referência.
 
 **Bloqueado por:** 01, 02, 04.
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Critérios de aceitação**
 
-- [ ] **RA-43** — `liveness` e `readiness` do Actuator respondem `UP` na porta `8080`.
-- [ ] **RF-38** — toda resposta de erro carrega momento em ISO 8601, descrição e Correlation ID
+- [x] **RA-43** — `liveness` e `readiness` do Actuator respondem `UP` na porta `8080`.
+- [x] **RF-38** — toda resposta de erro carrega momento em ISO 8601, descrição e Correlation ID
       (RN-40), documentada no OpenAPI (RA-41).
-- [ ] **RF-40** — o Correlation ID exibido é o identificador de rastreamento propagado via MDC
+- [x] **RF-40** — o Correlation ID exibido é o identificador de rastreamento propagado via MDC
       (RA-37), e localiza a mesma ocorrência nos registros. Um cenário prova isso de ponta a ponta,
       não por inspeção visual.
-- [ ] O Correlation ID é **um só do começo ao fim da requisição** (glossário) — não se regenera por
+- [x] O Correlation ID é **um só do começo ao fim da requisição** (glossário) — não se regenera por
       camada.
-- [ ] SpringDoc OpenAPI publicando o contrato, **substituindo o Swagger descartável do ticket 04** —
+- [x] SpringDoc OpenAPI publicando o contrato, **substituindo o Swagger descartável do ticket 04** —
       que é o que torna o contrato de erro acima uma implementação de um formato já acordado, e não
       um formato inventado aqui. O Swagger de fachada é aposentado no mesmo PR.
-- [ ] O cenário é escrito em Gherkin, com a linguagem do glossário nos passos, em
+- [x] O cenário é escrito em Gherkin, com a linguagem do glossário nos passos, em
       `src/test/resources/feature` (RA-44, RA-45), e roda contra dependências reais em contêiner
       (RA-47).
-- [ ] O cenário entra por HTTP e afirma o que sai por HTTP. Não afirma que um método foi chamado nem
+- [x] O cenário entra por HTTP e afirma o que sai por HTTP. Não afirma que um método foi chamado nem
       que uma classe existe (especificação §5.1).
-- [ ] O `ARCHITECTURE.md` aponta este cenário como a referência da costura S1.
+- [x] O `ARCHITECTURE.md` aponta este cenário como a referência da costura S1.

@@ -29,3 +29,8 @@ frontend Angular sem acessar schemas transacionais.
 
 As decisões completas e suas consequências permanecem em `docs/arquitetura-inicial.md` e
 `docs/adr/`; este arquivo apenas mapeia onde elas se materializam no código.
+
+## Cenários de referência
+
+- S1 — `backend/api/src/test/resources/feature/diagnostico-da-api.feature` verifica pela HTTP da
+  API as sondas de saúde, o contrato de erro e a localização de uma ocorrência pelo Correlation ID.
