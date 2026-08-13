@@ -16,19 +16,33 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
 
 public class ApiSteps {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Network NETWORK = Network.newNetwork();
+    private static final GenericContainer<?> COLLECTOR = new GenericContainer<>(
+                    "otel/opentelemetry-collector-contrib:0.116.1")
+            .withNetwork(NETWORK)
+            .withNetworkAliases("otel-collector")
+            .withCopyToContainer(
+                    MountableFile.forHostPath(Path.of("src/test/resources/otel/collector.yml")),
+                    "/etc/otelcol/config.yaml")
+            .withCommand("--config=/etc/otelcol/config.yaml")
+            .waitingFor(Wait.forLogMessage(".*Everything is ready.*", 1));
     private static final GenericContainer<?> API = new GenericContainer<>(new ImageFromDockerfile()
                     .withFileFromPath("app.jar", Path.of("target", "api-0.1.0-SNAPSHOT.jar"))
                     .withDockerfileFromBuilder(builder -> builder.from("eclipse-temurin:25-jre")
                             .copy("app.jar", "/app.jar")
                             .entryPoint("java", "-jar", "/app.jar")
                             .build()))
+            .withNetwork(NETWORK)
             .withExposedPorts(8080)
             .waitingFor(Wait.forHttp("/actuator/health/readiness").forStatusCode(200));
 
@@ -39,12 +53,15 @@ public class ApiSteps {
 
     @BeforeAll
     public static void iniciaApi() {
+        COLLECTOR.start();
         API.start();
     }
 
     @AfterAll
     public static void encerraApi() {
         API.stop();
+        COLLECTOR.stop();
+        NETWORK.close();
     }
 
     @Quando("as sondas de saúde da API são consultadas")
@@ -81,6 +98,11 @@ public class ApiSteps {
         assertTrue(API.getLogs().contains("traceId=" + correlationId));
     }
 
+    @Entao("o Correlation ID da resposta chega ao Collector de telemetria")
+    public void correlationIdChegaAoCollectorDeTelemetria() throws InterruptedException {
+        awaitCollectorLog(correlationId);
+    }
+
     @Entao("o contrato OpenAPI documenta a resposta de erro")
     public void contratoOpenApiDocumentaRespostaDeErro() throws IOException, InterruptedException {
         HttpResponse<String> response = get("/v3/api-docs");
@@ -106,5 +128,16 @@ public class ApiSteps {
 
     private static JsonNode json(HttpResponse<String> response) throws IOException {
         return OBJECT_MAPPER.readTree(response.body());
+    }
+
+    private static void awaitCollectorLog(String traceId) throws InterruptedException {
+        long timeout = System.nanoTime() + Duration.ofSeconds(10).toNanos();
+        while (System.nanoTime() < timeout) {
+            if (COLLECTOR.getLogs().contains(traceId)) {
+                return;
+            }
+            Thread.sleep(250);
+        }
+        assertTrue(COLLECTOR.getLogs().contains(traceId), COLLECTOR::getLogs);
     }
 }

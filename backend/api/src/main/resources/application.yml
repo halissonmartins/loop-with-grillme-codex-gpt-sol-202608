@@ -1,6 +1,10 @@
 server:
   port: ${API_PORT:8080}
 
+spring:
+  config:
+    import: classpath:telemetry.yml
+
 management:
   endpoint:
     health:

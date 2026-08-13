@@ -37,6 +37,7 @@
     <cucumber.version>7.34.3</cucumber.version>
     <springdoc.version>3.1.0</springdoc.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+    <opentelemetry.instrumentation.version>2.16.0-alpha</opentelemetry.instrumentation.version>
     <spotless-maven-plugin.version>3.9.0</spotless-maven-plugin.version>
     <palantir-java-format.version>2.97.0</palantir-java-format.version>
   </properties>

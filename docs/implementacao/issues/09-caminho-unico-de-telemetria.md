@@ -14,14 +14,14 @@ alguém esquece em três deles.
 
 **Critérios de aceitação**
 
-- [ ] Log, span, trace e métrica saem para o **OTel Collector**, que os distribui para a pesquisa de
+- [x] Log, span, trace e métrica saem para o **OTel Collector**, que os distribui para a pesquisa de
       log, as métricas/painéis e os traces (RA-36).
-- [ ] Logs **estruturados**, enriquecidos com os identificadores de rastreamento (RA-38) — pesquisa
+- [x] Logs **estruturados**, enriquecidos com os identificadores de rastreamento (RA-38) — pesquisa
       por ocorrência, não por texto livre.
-- [ ] O mecanismo mora na biblioteca comum (RA-02) e é consumido por API e starter da mesma forma.
-- [ ] **RA-39** — o SDK de telemetria fica **desabilitado nos testes** (JUnit, Cucumber,
+- [x] O mecanismo mora na biblioteca comum (RA-02) e é consumido por API e starter da mesma forma.
+- [x] **RA-39** — o SDK de telemetria fica **desabilitado nos testes** (JUnit, Cucumber,
       Testcontainers): a suíte não depende de coletor nem gera telemetria.
-- [ ] A convenção de rótulos já está definida — sigla do produto, código do relatório e origem da
+- [x] A convenção de rótulos já está definida — sigla do produto, código do relatório e origem da
       execução (RA-40) — mesmo que as métricas de negócio só apareçam no ticket 29.
-- [ ] Um cenário prova que o Correlation ID exibido na resposta de erro (ticket 08) é encontrável
+- [x] Um cenário prova que o Correlation ID exibido na resposta de erro (ticket 08) é encontrável
       pelo caminho de log configurado aqui.

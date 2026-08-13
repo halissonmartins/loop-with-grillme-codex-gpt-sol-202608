@@ -6,25 +6,35 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
       http:
+        endpoint: 0.0.0.0:4318
 
 exporters:
   debug:
     verbosity: basic
+  otlp/graylog:
+    endpoint: graylog:4317
+    tls:
+      insecure: true
   otlp/jaeger:
     endpoint: jaeger:4317
     tls:
       insecure: true
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    resource_to_telemetry_conversion:
+      enabled: true
 
 service:
   extensions: [health_check]
   pipelines:
     logs:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlp/graylog]
     metrics:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, prometheus]
     traces:
       receivers: [otlp]
       exporters: [otlp/jaeger]

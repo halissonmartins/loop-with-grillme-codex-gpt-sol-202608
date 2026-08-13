@@ -11,3 +11,8 @@ Funcionalidade: Diagnóstico da API
     Então a resposta de erro informa momento, descrição e Correlation ID
     E o Correlation ID da resposta localiza a mesma ocorrência nos registros da operação
     E o contrato OpenAPI documenta a resposta de erro
+
+  Cenário: Correlation ID chega ao caminho de telemetria
+    Quando uma solicitação não encontra um recurso da API
+    Então a resposta de erro informa momento, descrição e Correlation ID
+    E o Correlation ID da resposta chega ao Collector de telemetria

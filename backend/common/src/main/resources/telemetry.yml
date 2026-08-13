@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ${TELEMETRY_SERVICE_NAME:relatorios}
+
+logging:
+  structured:
+    format:
+      console: logstash
+
+management:
+  opentelemetry:
+    resource-attributes:
+      service.namespace: relatorios
+    tracing:
+      sampler: always-on
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://otel-collector:4318}/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://otel-collector:4318}/v1/logs
+  otlp:
+    metrics:
+      export:
+        step: 1s
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://otel-collector:4318}/v1/metrics
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+management:
+  opentelemetry:
+    enabled: false
+  tracing:
+    export:
+      enabled: false
+  otlp:
+    logging:
+      export:
+        enabled: false
+    metrics:
+      export:
+        enabled: false
