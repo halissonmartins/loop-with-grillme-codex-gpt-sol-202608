@@ -10,7 +10,7 @@ alguém esquece em três deles.
 
 **Bloqueado por:** 02, 08.
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Critérios de aceitação**
 
